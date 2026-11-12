@@ -9,6 +9,8 @@
 4. **Hazte administrador:** abre `supabase/2_admin_y_datos.sql`, cambia `CAMBIA-ESTO@tucorreo.com` por tu correo, pégalo en SQL Editor → **Run**. (También carga categorías y 10 productos de ejemplo.)
 5. **Dos datos de conexión:** **Project Settings → API**. Copia **Project URL** y la clave **anon / publishable**.
 
+> **¿Ya tenías la versión anterior funcionando?** Solo ejecuta `supabase/3_actualizacion_promociones.sql` en SQL Editor (no repitas los pasos 1 y 2) y vuelve a publicar en Vercel.
+
 ### B) En Vercel (vercel.com)
 1. Sube esta carpeta a GitHub e impórtala en Vercel (Add New → Project). Framework: Vite (se detecta solo).
 2. En **Environment Variables** agrega (o importa un archivo `.env` con ellas):
@@ -22,6 +24,10 @@
 
 ## Probar en tu computadora (opcional)
 Copia `.env.example` a `.env`, rellena los dos valores y ejecuta `npm install` y `npm run dev`.
+
+## Promociones y ubicación
+- Promociones: categoría **Promociones** (siempre primera). Para que un producto aparezca como oferta, escribe su *Precio anterior* en el panel: se muestra tachado y con el % de descuento. Las promos con foto forman el banner principal.
+- Ubicación: dirección, horario y búsqueda del mapa se editan en Admin > Ajustes.
 
 ## Notas
 - Los productos, fotos y precios de ejemplo son ilustrativos: reemplázalos por los reales.

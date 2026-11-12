@@ -4,7 +4,7 @@ import { BRAND, money } from '../../config/brand'
 import type { Category, Product } from '../../types'
 
 type Form = Omit<Product, 'id' | 'slug' | 'created_at'> & { id?: string }
-const empty: Form = { category_id: null, name: '', description: '', price: 0, image_url: '', tag: '', active: true, featured: false }
+const empty: Form = { category_id: null, name: '', description: '', price: 0, old_price: null, image_url: '', tag: '', active: true, featured: false }
 
 export default function AdminProducts() {
   const [list, setList] = useState<Product[]>([])
@@ -50,6 +50,7 @@ export default function AdminProducts() {
         <label>Categoría<select value={f.category_id ?? ''} onChange={e => setF({ ...f, category_id: e.target.value || null })}>
           <option value="">Sin categoría</option>{cats.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
         <label>Precio ({BRAND.currency})<input type="number" step="0.01" min="0" required value={f.price} onChange={e => setF({ ...f, price: Number(e.target.value) })} /></label>
+        <label>Precio anterior (opcional, se muestra tachado como oferta)<input type="number" step="0.01" min="0" value={f.old_price ?? ''} onChange={e => setF({ ...f, old_price: e.target.value === '' ? null : Number(e.target.value) })} /></label>
         <label>Descripción<textarea rows={3} value={f.description} onChange={e => setF({ ...f, description: e.target.value })} /></label>
         <label>Etiqueta (opcional, ej. Favorito)<input value={f.tag} onChange={e => setF({ ...f, tag: e.target.value })} /></label>
         <label>Imagen<input type="file" accept="image/*" onChange={e => { const x = e.target.files?.[0]; if (x) void upload(x) }} /></label>

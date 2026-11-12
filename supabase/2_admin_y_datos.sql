@@ -2,7 +2,7 @@
 -- (marca "Auto Confirm User"). Luego CAMBIA el correo de abajo por ese mismo correo y pulsa Run.
 
 insert into public.admins (user_id, email)
-select id, email from auth.users where lower(email) = lower('vladimirtrading2026@gmail.com')
+select id, email from auth.users where lower(email) = lower('CAMBIA-ESTO@tucorreo.com')
 on conflict do nothing;
 
 insert into public.settings (key, value) values
@@ -12,7 +12,7 @@ insert into public.settings (key, value) values
 on conflict (key) do nothing;
 
 insert into public.categories (name, slug, emoji, sort) values
- ('Pizzas','pizzas','🍕',1),('Café','cafe','☕',2),('Postres','postres','🍰',3),
+ ('Promociones','promociones','🔥',0),('Pizzas','pizzas','🍕',1),('Café','cafe','☕',2),('Postres','postres','🍰',3),
  ('Helados','helados','🍨',4),('Masas','masas','🥐',5)
 on conflict (slug) do nothing;
 
@@ -30,4 +30,13 @@ select c.id, v.name, v.slug, v.descr, v.price, v.img, v.tag, v.feat from (values
  ('helados','Helado con toppings','helado-con-toppings','Una combinación divertida y llena de sabor.',24,'https://images.unsplash.com/photo-1501446529957-6226bd447c46?auto=format&fit=crop&w=700&q=80','A tu gusto',true),
  ('masas','Masa recién horneada','masa-recien-horneada','Ideal para acompañar un café o compartir.',12,'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=700&q=80','Recién hecha',false)
 ) as v(cat,name,slug,descr,price,img,tag,feat) join public.categories c on c.slug = v.cat
+on conflict (slug) do nothing;
+
+-- Promociones de EJEMPLO (precio normal tachado = old_price). Cambia nombres y precios desde el panel.
+insert into public.products (category_id, name, slug, description, price, old_price, image_url, tag, featured)
+select c.id, v.name, v.slug, v.descr, v.price, v.old, v.img, v.tag, true from (values
+ ('Combo pizza + café','combo-pizza-cafe','1 pizza clásica + 2 cafés para compartir.',79,95,'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1200&q=80','Combo'),
+ ('Pizza de la casa en oferta','pizza-casa-oferta','Nuestra pizza favorita a precio especial.',55,65,'https://images.unsplash.com/photo-1579751626657-72bc17010498?auto=format&fit=crop&w=1200&q=80','Oferta'),
+ ('Postre + helado','postre-helado','Un postre y un helado para endulzar el día.',39,48,'https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=1200&q=80','Dulce combo')
+) as v(name,slug,descr,price,old,img,tag) join public.categories c on c.slug = 'promociones'
 on conflict (slug) do nothing;

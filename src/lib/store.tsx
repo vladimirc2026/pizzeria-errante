@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { supabase, configured } from './supabase'
 import { BRAND } from '../config/brand'
 import type { Category, Product, OrderItem } from '../types'
@@ -6,7 +6,7 @@ import type { Category, Product, OrderItem } from '../types'
 /* ---------- Datos de la tienda (categorías, productos, ajustes) ---------- */
 interface StoreCtx {
   categories: Category[]; products: Product[]; loading: boolean; error: string
-  settings: { whatsapp: string; address: string; hours: string }
+  settings: { whatsapp: string; address: string; hours: string; mapQuery: string }
 }
 const Store = createContext<StoreCtx>(null!)
 export const useStore = () => useContext(Store)
@@ -31,14 +31,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     })
   }, [])
   const settings = useMemo(() => ({
-    whatsapp: s.whatsapp || BRAND.whatsapp, address: s.address || BRAND.address, hours: s.hours || BRAND.hours,
+    whatsapp: s.whatsapp || BRAND.whatsapp, address: s.address || BRAND.address, hours: s.hours || BRAND.hours, mapQuery: s.map_query || BRAND.mapQuery,
   }), [s])
   return <Store.Provider value={{ categories, products, loading, error, settings }}>{children}</Store.Provider>
 }
 
 /* ---------- Carrito ---------- */
 interface CartCtx {
-  items: OrderItem[]; count: number; total: number
+  items: OrderItem[]; count: number; total: number; toast: { name: string; n: number } | null
   add: (p: Product) => void; setQty: (id: string, q: number) => void; clear: () => void
 }
 const Cart = createContext<CartCtx>(null!)
@@ -49,12 +49,20 @@ export function CartProvider({ children }: { children: ReactNode }) {
     try { return JSON.parse(localStorage.getItem('errante-cart') || '[]') as OrderItem[] } catch { return [] }
   })
   useEffect(() => { try { localStorage.setItem('errante-cart', JSON.stringify(items)) } catch { /* ignorar */ } }, [items])
-  const add = (p: Product) => setItems(cur => cur.some(i => i.id === p.id)
+  const [toast, setToast] = useState<{ name: string; n: number } | null>(null)
+  const timer = useRef<number | undefined>(undefined)
+  const notify = (name: string) => {
+    setToast(t => ({ name, n: (t?.n ?? 0) + 1 }))
+    window.clearTimeout(timer.current)
+    timer.current = window.setTimeout(() => setToast(null), 2600)
+  }
+  const add = (p: Product) => { notify(p.name); addItem(p) }
+  const addItem = (p: Product) => setItems(cur => cur.some(i => i.id === p.id)
     ? cur.map(i => i.id === p.id ? { ...i, qty: i.qty + 1 } : i)
     : [...cur, { id: p.id, name: p.name, price: Number(p.price), qty: 1 }])
   const setQty = (id: string, q: number) => setItems(cur => q <= 0 ? cur.filter(i => i.id !== id) : cur.map(i => i.id === id ? { ...i, qty: q } : i))
   const value: CartCtx = {
-    items, add, setQty, clear: () => setItems([]),
+    items, add, setQty, toast, clear: () => setItems([]),
     count: items.reduce((a, i) => a + i.qty, 0), total: items.reduce((a, i) => a + i.qty * i.price, 0),
   }
   return <Cart.Provider value={value}>{children}</Cart.Provider>

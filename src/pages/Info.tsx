@@ -1,8 +1,6 @@
 import { Link } from 'react-router-dom'
-import { MapPin, MessageCircle, Clock } from 'lucide-react'
 import { BRAND } from '../config/brand'
-import { useStore } from '../lib/store'
-import { waLink } from '../components/Layout'
+import Location from '../components/Location'
 
 export function About() {
   return (
@@ -19,18 +17,7 @@ export function About() {
 }
 
 export function Contact() {
-  const { settings } = useStore()
-  const maps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(settings.address)}`
-  return (
-    <div className="wrap section">
-      <div className="head"><div><span className="kicker">Te esperamos</span><h2>Contacto</h2></div></div>
-      <div className="contact">
-        <div className="card"><MapPin /><h3>Dirección</h3><p>{settings.address}</p><a className="btn outline" href={maps} target="_blank" rel="noopener noreferrer">Cómo llegar</a></div>
-        <div className="card"><MessageCircle /><h3>WhatsApp</h3><p>+{settings.whatsapp}</p><a className="btn" href={waLink(settings.whatsapp, 'Hola ERRANTE, tengo una consulta.')} target="_blank" rel="noopener noreferrer">Escribirnos</a></div>
-        <div className="card"><Clock /><h3>Horario</h3><p>{settings.hours}</p></div>
-      </div>
-    </div>
-  )
+  return <Location />
 }
 
 export function NotFound() {

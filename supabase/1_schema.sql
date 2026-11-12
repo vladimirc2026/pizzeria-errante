@@ -14,7 +14,7 @@ create table if not exists public.products (
   id uuid primary key default gen_random_uuid(),
   category_id uuid references public.categories(id) on delete set null,
   name text not null, slug text unique not null, description text default '',
-  price numeric(10,2) not null default 0, image_url text default '', tag text default '',
+  price numeric(10,2) not null default 0, old_price numeric(10,2), image_url text default '', tag text default '',
   active boolean default true, featured boolean default false, created_at timestamptz default now()
 );
 create table if not exists public.orders (

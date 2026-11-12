@@ -6,6 +6,7 @@ export const BRAND = {
   currency: 'Bs',
   whatsapp: '59168609243',
   address: 'Calle Colomi #2078, entre calles Ayoma y Tablas, zona Jayhuayco, Cochabamba',
+  mapQuery: 'Calle Colomi 2078, Jayhuayco, Cochabamba, Bolivia',
   hours: 'Consulta nuestro horario por WhatsApp',
   logo: '/logo.png',
   storageBucket: 'productos',

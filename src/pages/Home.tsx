@@ -1,46 +1,46 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, MessageCircle } from 'lucide-react'
 import { BRAND } from '../config/brand'
 import { useStore } from '../lib/store'
-import { waLink } from '../components/Layout'
 import ProductCard from '../components/ProductCard'
+import Row from '../components/Row'
+import Banner from '../components/Banner'
+import Location from '../components/Location'
 
 export default function Home() {
-  const { categories, products, loading, error, settings } = useStore()
-  const featured = (products.some(p => p.featured) ? products.filter(p => p.featured) : products).slice(0, 8)
+  const { categories, products, loading, error } = useStore()
+  const promoCat = categories.find(c => c.slug === 'promociones')
+  const promos = products.filter(p => p.category_id === promoCat?.id && p.image_url)
+  const slides = (promos.length ? promos : products.filter(p => p.featured && p.image_url)).slice(0, 5)
+  const go = (slug: string) => document.getElementById(`cat-${slug}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   return (
     <>
-      <section className="hero"><div className="wrap hero-grid">
-        <div>
-          <span className="eyebrow">Un viaje de sabores</span>
-          <h1>Hay sabores<br />que te hacen<br /><em>volver.</em></h1>
-          <p>Pizza recién hecha, café para disfrutar, postres que alegran el día y mucho más. En {BRAND.name}, cada antojo puede convertirse en tu nuevo favorito.</p>
-          <div className="actions">
-            <Link to="/tienda" className="btn">Explorar el menú <ArrowRight size={16} /></Link>
-            <a className="btn outline" href={waLink(settings.whatsapp, 'Hola ERRANTE, quisiera consultar el menú.')} target="_blank" rel="noopener noreferrer"><MessageCircle size={16} /> Consultar por WhatsApp</a>
-          </div>
-        </div>
-        <div className="hero-visual">
-          <img src="https://images.unsplash.com/photo-1579751626657-72bc17010498?auto=format&fit=crop&w=1100&q=85" alt="Pizza artesanal recién horneada" />
-          <div className="stamp">HECHO PARA<br />DISFRUTAR<br />✦</div>
-        </div>
-      </div></section>
+      {slides.length > 0 ? <Banner slides={slides} /> : (
+        <section className="hero"><div className="wrap section center">
+          <h1>{BRAND.name}</h1><p className="muted">{BRAND.tagline}</p>
+          {loading && <p className="muted">Cargando…</p>}{error && <p className="notice">{error}</p>}
+        </div></section>
+      )}
 
-      <section className="wrap section">
-        <div className="head"><div><span className="kicker">Encuentra tu favorito</span><h2>¿Qué se te antoja hoy?</h2></div></div>
-        <div className="cats">
-          {categories.map(c => (
-            <Link key={c.id} to={`/categoria/${c.slug}`} className="cat"><span>{c.emoji}</span><strong>{c.name}</strong></Link>
-          ))}
-        </div>
+      <div className="wrap"><div className="catnav" role="navigation" aria-label="Categorías del menú">
+        {categories.map(c => <button key={c.id} onClick={() => go(c.slug)}><span>{c.emoji}</span>{c.name}</button>)}
+        <a href="#ubicacion"><span>📍</span>Ubicación</a>
+      </div></div>
+
+      {categories.map(c => {
+        const list = products.filter(p => p.category_id === c.id)
+        if (list.length === 0) return null
+        return (
+          <Row key={c.id} id={`cat-${c.slug}`} title={`${c.emoji} ${c.name}`} to={`/categoria/${c.slug}`}>
+            {list.map(p => <div className="slide" key={p.id}><ProductCard p={p} /></div>)}
+          </Row>
+        )
+      })}
+
+      <section className="wrap section center story">
+        <span className="kicker">Nuestra esencia</span><h2>Un lugar para disfrutar juntos.</h2>
+        <p className="muted">Para empresas, familias, jóvenes y niños. <Link to="/nosotros">Conócenos →</Link></p>
       </section>
-
-      <section className="alt"><div className="wrap section">
-        <div className="head"><div><span className="kicker">Un vistazo al menú</span><h2>Algo rico te espera</h2></div><Link to="/tienda" className="btn outline">Ver todo</Link></div>
-        {loading && <p className="muted">Cargando…</p>}
-        {error && <p className="notice">{error}</p>}
-        <div className="grid">{featured.map(p => <ProductCard key={p.id} p={p} />)}</div>
-      </div></section>
+      <Location />
     </>
   )
 }

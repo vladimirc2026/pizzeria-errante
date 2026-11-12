@@ -7,7 +7,7 @@ interface AdminRow { user_id: string; email: string }
 
 export default function AdminSettings() {
   const { email: me } = useAuth()
-  const [s, setS] = useState({ whatsapp: BRAND.whatsapp, address: BRAND.address, hours: BRAND.hours })
+  const [s, setS] = useState({ whatsapp: BRAND.whatsapp, address: BRAND.address, hours: BRAND.hours, map_query: BRAND.mapQuery })
   const [msg, setMsg] = useState('')
   const [admins, setAdmins] = useState<AdminRow[]>([])
   const [nu, setNu] = useState({ email: '', pass: '' })
@@ -16,7 +16,7 @@ export default function AdminSettings() {
   const load = useCallback(async () => {
     const st = await supabase.from('settings').select('*')
     const m = Object.fromEntries(((st.data as { key: string; value: string }[]) ?? []).map(r => [r.key, r.value]))
-    setS(cur => ({ whatsapp: m.whatsapp || cur.whatsapp, address: m.address || cur.address, hours: m.hours || cur.hours }))
+    setS(cur => ({ whatsapp: m.whatsapp || cur.whatsapp, address: m.address || cur.address, hours: m.hours || cur.hours, map_query: m.map_query || cur.map_query }))
     const a = await supabase.from('admins').select('user_id,email').order('created_at')
     setAdmins((a.data as AdminRow[]) ?? [])
   }, [])
@@ -45,6 +45,7 @@ export default function AdminSettings() {
       <form className="card form" onSubmit={save}>
         <label>WhatsApp (con código de país, sin +)<input value={s.whatsapp} onChange={e => setS({ ...s, whatsapp: e.target.value })} /></label>
         <label>Dirección<input value={s.address} onChange={e => setS({ ...s, address: e.target.value })} /></label>
+        <label>Búsqueda para el mapa (ej. Calle Colomi 2078, Cochabamba)<input value={s.map_query} onChange={e => setS({ ...s, map_query: e.target.value })} /></label>
         <label>Horario<input value={s.hours} onChange={e => setS({ ...s, hours: e.target.value })} /></label>
         <button className="btn">Guardar</button>{msg && <p className="muted">{msg}</p>}
       </form>
