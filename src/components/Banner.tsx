@@ -26,7 +26,9 @@ export default function Banner({ slides }: { slides: Product[] }) {
         <p>{p.description}</p>
         <div className="prices big"><span className="price">{money(p.price)}</span>{off > 0 && <s>{money(p.old_price ?? 0)}</s>}</div>
         <div className="actions">
-          <button className="btn" onClick={() => add(p)}><ShoppingCart size={16} /> Agregar al carrito</button>
+          {(p.variants ?? []).length > 0
+            ? <Link to={`/producto/${p.slug}`} className="btn"><ShoppingCart size={16} /> Elegir tamaño</Link>
+            : <button className="btn" onClick={() => add(p)}><ShoppingCart size={16} /> Agregar al carrito</button>}
           <Link to={`/producto/${p.slug}`} className="btn ghost">Ver más</Link>
         </div>
       </div>

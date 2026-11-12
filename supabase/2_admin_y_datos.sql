@@ -40,3 +40,8 @@ select c.id, v.name, v.slug, v.descr, v.price, v.old, v.img, v.tag, true from (v
  ('Postre + helado','postre-helado','Un postre y un helado para endulzar el día.',39,48,'https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=1200&q=80','Dulce combo')
 ) as v(name,slug,descr,price,old,img,tag) join public.categories c on c.slug = 'promociones'
 on conflict (slug) do nothing;
+
+-- Tamaños e ingredientes de EJEMPLO para las pizzas (edítalos desde el panel: Productos > Editar).
+update public.products set variants='[{"name":"Personal","price":35},{"name":"Mediana","price":55},{"name":"Grande","price":79},{"name":"Familiar","price":99}]'::jsonb, price=35,
+  ingredients='Queso mozzarella, salsa de tomate, orégano, masa artesanal' where slug in ('pizza-de-la-casa','pizza-clasica','pizza-especial') and variants='[]'::jsonb;
+update public.products set ingredients='Jamón, pepperoni, champiñones, aceitunas, queso mozzarella' where slug='pizza-especial' and ingredients='';

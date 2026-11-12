@@ -31,7 +31,8 @@ export default function App() {
         <Route path="admin/login" element={<AdminLogin />} />
         <Route path="admin" element={<AdminShell />}>
           <Route index element={<Dashboard />} />
-          <Route path="productos" element={<AdminProducts />} />
+          <Route path="promociones" element={<AdminProducts key="promo" promo />} />
+          <Route path="productos" element={<AdminProducts key="all" />} />
           <Route path="categorias" element={<AdminCategories />} />
           <Route path="pedidos" element={<AdminOrders />} />
           <Route path="ajustes" element={<AdminSettings />} />

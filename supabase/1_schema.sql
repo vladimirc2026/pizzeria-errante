@@ -7,20 +7,20 @@ create table if not exists public.admins (
 );
 create table if not exists public.categories (
   id uuid primary key default gen_random_uuid(),
-  name text not null, slug text unique not null, emoji text default '🍽️',
+  name text not null, slug text unique not null, emoji text default '🍽️', image_url text default '',
   sort int default 0, active boolean default true
 );
 create table if not exists public.products (
   id uuid primary key default gen_random_uuid(),
   category_id uuid references public.categories(id) on delete set null,
-  name text not null, slug text unique not null, description text default '',
+  name text not null, slug text unique not null, description text default '', ingredients text default '', variants jsonb not null default '[]'::jsonb,
   price numeric(10,2) not null default 0, old_price numeric(10,2), image_url text default '', tag text default '',
   active boolean default true, featured boolean default false, created_at timestamptz default now()
 );
 create table if not exists public.orders (
   id uuid primary key default gen_random_uuid(),
   customer_name text not null, phone text not null, address text default '', notes text default '',
-  items jsonb not null, total numeric(10,2) not null, status text not null default 'nuevo',
+  items jsonb not null, total numeric(10,2) not null, status text not null default 'nuevo', order_type text default 'delivery',
   created_at timestamptz default now()
 );
 create table if not exists public.settings (key text primary key, value text not null default '');

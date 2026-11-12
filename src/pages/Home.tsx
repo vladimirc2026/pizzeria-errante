@@ -22,8 +22,14 @@ export default function Home() {
       )}
 
       <div className="wrap"><div className="catnav" role="navigation" aria-label="Categorías del menú">
-        {categories.map(c => <button key={c.id} onClick={() => go(c.slug)}><span>{c.emoji}</span>{c.name}</button>)}
+        {categories.map(c => <button key={c.id} onClick={() => go(c.slug)}><span className="cthumb">{c.image_url ? <img src={c.image_url} alt="" /> : c.emoji}</span>{c.name}</button>)}
         <a href="#ubicacion"><span>📍</span>Ubicación</a>
+      </div></div>
+
+      <div className="wrap"><div className="services">
+        <Link to="/carrito"><span>🛵</span><div><strong>Delivery</strong><small>Te lo llevamos a tu puerta</small></div></Link>
+        <Link to="/carrito"><span>🏪</span><div><strong>Recoger en local</strong><small>Pides y pasas a buscarlo</small></div></Link>
+        <Link to="/carrito"><span>🍽️</span><div><strong>Comer en el restaurante</strong><small>Te esperamos en la mesa</small></div></Link>
       </div></div>
 
       {categories.map(c => {

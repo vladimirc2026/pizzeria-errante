@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { supabase, configured } from './supabase'
 import { BRAND } from '../config/brand'
-import type { Category, Product, OrderItem } from '../types'
+import type { Category, Product, OrderItem, Variant } from '../types'
 
 /* ---------- Datos de la tienda (categorías, productos, ajustes) ---------- */
 interface StoreCtx {
@@ -39,7 +39,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 /* ---------- Carrito ---------- */
 interface CartCtx {
   items: OrderItem[]; count: number; total: number; toast: { name: string; n: number } | null
-  add: (p: Product) => void; setQty: (id: string, q: number) => void; clear: () => void
+  add: (p: Product, v?: Variant, qty?: number) => void; setQty: (id: string, q: number) => void; clear: () => void
 }
 const Cart = createContext<CartCtx>(null!)
 export const useCart = () => useContext(Cart)
@@ -56,10 +56,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
     window.clearTimeout(timer.current)
     timer.current = window.setTimeout(() => setToast(null), 2600)
   }
-  const add = (p: Product) => { notify(p.name); addItem(p) }
-  const addItem = (p: Product) => setItems(cur => cur.some(i => i.id === p.id)
-    ? cur.map(i => i.id === p.id ? { ...i, qty: i.qty + 1 } : i)
-    : [...cur, { id: p.id, name: p.name, price: Number(p.price), qty: 1 }])
+  const add = (p: Product, v?: Variant, qty = 1) => { notify(v ? `${p.name} (${v.name})` : p.name); addItem(p, v, qty) }
+  const addItem = (p: Product, v: Variant | undefined, qty: number) => setItems(cur => {
+    const id = v ? `${p.id}:${v.name}` : p.id
+    if (cur.some(i => i.id === id)) return cur.map(i => i.id === id ? { ...i, qty: i.qty + qty } : i)
+    return [...cur, { id, name: v ? `${p.name} (${v.name})` : p.name, price: Number(v?.price ?? p.price), qty }]
+  })
   const setQty = (id: string, q: number) => setItems(cur => q <= 0 ? cur.filter(i => i.id !== id) : cur.map(i => i.id === id ? { ...i, qty: q } : i))
   const value: CartCtx = {
     items, add, setQty, toast, clear: () => setItems([]),
